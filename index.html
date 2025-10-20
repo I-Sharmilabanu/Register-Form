@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register Form</title>
+  <link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+  <div class="container">
+    <h2>Register</h2>
+    <form id="registerForm">
+      <label>Name</label>
+      <input type="text" id="name" class="input">
+      <div id="err-name" class="error"></div>
+
+      <label>Age</label>
+      <input type="number" id="age" class="input">
+      <div id="err-age" class="error"></div>
+
+      <label>Gender</label>
+      <div class="gender">
+        <input type="radio" id="male" name="gender" value="Male"> Male
+        <input type="radio" id="female" name="gender" value="Female"> Female
+      </div>
+      <div id="err-gender" class="error"></div>
+
+      <label>Course</label>
+      <select id="course" class="input">
+        <option value="">Select your course</option>
+        <option value="Python">Python</option>
+        <option value="Java">Java</option>
+        <option value="HTML">HTML</option>
+      </select>
+      <div id="err-course" class="error"></div>
+
+      <label>Email</label>
+      <input type="email" id="email" class="input">
+      <div id="err-email" class="error"></div>
+
+      <label>Password</label>
+      <input type="password" id="password" class="input">
+      <div id="err-password" class="error"></div>
+
+      <button type="button" onclick="saveForm()">Save</button>
+    </form>
+  </div>
+
+  <table id="dataTable">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Age</th>
+        <th>Gender</th>
+        <th>Course</th>
+        <th>Email</th>
+        <th>Delete</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody">
+      
+    </tbody>
+  </table>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", showData);
+
+    function clearError() {
+      document.querySelectorAll(".error").forEach(el => el.textContent = "");
+    }
+
+    function saveForm() {
+      clearError();
+
+      const name = document.getElementById("name").value.trim();
+      const age = document.getElementById("age").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+      const course = document.getElementById("course").value;
+      const gender = document.querySelector('input[name="gender"]:checked')?.value;
+
+      
+      if (!name) {
+        document.getElementById("err-name").textContent = "Please enter your name";
+        document.getElementById("name").focus();
+        return;
+      }
+
+      if (!age) {
+        document.getElementById("err-age").textContent = "Please enter your age";
+        document.getElementById("age").focus();
+        return;
+      }
+
+      if (!gender) {
+        document.getElementById("err-gender").textContent = "Please select your gender";
+        return;
+      }
+
+      if (!course) {
+        document.getElementById("err-course").textContent = "Please select your course";
+        document.getElementById("course").focus();
+        return;
+      }
+
+      if (!email) {
+        document.getElementById("err-email").textContent = "Please enter your email";
+        document.getElementById("email").focus();
+        return;
+      }
+
+      if (!password) {
+        document.getElementById("err-password").textContent = "Please enter your password";
+        document.getElementById("password").focus();
+        return;
+      }
+
+      if (password.length < 6) {
+        document.getElementById("err-password").textContent = "Password must be at least 6 characters";
+        document.getElementById("password").focus();
+        return;
+      }
+
+      
+      const user = { name, age, gender, course, email, password };
+
+      let users = JSON.parse(localStorage.getItem("users")) || [];
+      users.push(user);
+      localStorage.setItem("users", JSON.stringify(users));
+
+      document.getElementById("registerForm").reset();
+      showData();
+    }
+
+    function showData() {
+      const users = JSON.parse(localStorage.getItem("users")) || [];
+      const tableBody = document.getElementById("tableBody");
+      tableBody.innerHTML = "";
+
+      users.forEach((user, index) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${user.name}</td>
+          <td>${user.age}</td>
+          <td>${user.gender}</td>
+          <td>${user.course}</td>
+          <td>${user.email}</td>
+          <td><button onclick="deleteUser(${index})">Delete</button></td>
+        `;
+        tableBody.appendChild(row);
+      });
+    }
+
+    function deleteUser(index) {
+      let users = JSON.parse(localStorage.getItem("users")) || [];
+      users.splice(index, 1);
+      localStorage.setItem("users", JSON.stringify(users));
+      showData();
+    }
+  </script>
+</body>
+</html>
